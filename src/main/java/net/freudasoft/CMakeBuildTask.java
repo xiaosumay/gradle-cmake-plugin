@@ -19,14 +19,17 @@ public class CMakeBuildTask extends DefaultTask {
     private final Property<String> buildTarget;
     private final Property<Boolean> buildClean;
 
+    private final Property<String> jobCount;
+
     public CMakeBuildTask() {
         setGroup("cmake");
-        setDescription("Build a configured Build with CMake");
+
         executable = getProject().getObjects().property(String.class);
         workingFolder = getProject().getObjects().directoryProperty();
         buildConfig = getProject().getObjects().property(String.class);
         buildTarget = getProject().getObjects().property(String.class);
         buildClean = getProject().getObjects().property(Boolean.class);
+        jobCount = getProject().getObjects().property(String.class);
     }
 
     public void configureFromProject() {
@@ -36,6 +39,7 @@ public class CMakeBuildTask extends DefaultTask {
         buildConfig.set( ext.getBuildConfig() );
         buildTarget.set( ext.getBuildTarget() );
         buildClean.set( ext.getBuildClean() );
+        jobCount.set( ext.getJobCount() );
     }
 
 
@@ -68,6 +72,12 @@ public class CMakeBuildTask extends DefaultTask {
     public Property<Boolean> getBuildClean() {
         return buildClean;
     }
+
+    @Input
+    @Optional
+    public Property<String> getJobCount() {
+        return jobCount;
+    }
     /// endregion
 
     private List<String> buildCmdLine() {
@@ -77,18 +87,27 @@ public class CMakeBuildTask extends DefaultTask {
         parameters.add("--build");
         parameters.add("." ); // working folder will be executable working dir --- workingFolder.getAsFile().get().getAbsolutePath()
 
-        if ( ! buildConfig.isPresent() ) {
+        if (buildConfig.isPresent() ) {
             parameters.add("--config");
             parameters.add(buildConfig.get());
         }
 
-        if ( ! buildTarget.isPresent() ) {
+        if (buildTarget.isPresent() ) {
             parameters.add("--target");
             parameters.add(buildTarget.get());
         }
 
         if ( buildClean.getOrElse(Boolean.FALSE).booleanValue() )
             parameters.add( "--clean-first" );
+
+        if (jobCount.isPresent()) {
+            parameters.add("--");
+
+            int pn = Runtime.getRuntime().availableProcessors();
+            if(pn > 8) pn = 8;
+
+            parameters.add("-j" + pn);
+        }
 
         return parameters;
     }

@@ -70,6 +70,7 @@ public class CMakePlugin implements Plugin<Project> {
                 task.getBuildConfig().set(extension.getBuildConfig());
                 task.getBuildTarget().set(extension.getBuildTarget());
                 task.getBuildClean().set(extension.getBuildClean());
+                task.getJobCount().set(extension.getJobCount());
             }
         });
 

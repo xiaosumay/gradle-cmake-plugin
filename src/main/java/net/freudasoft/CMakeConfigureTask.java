@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.lang.String;
 
 public class CMakeConfigureTask extends DefaultTask {
     private final Property<String> executable;
@@ -26,7 +27,7 @@ public class CMakeConfigureTask extends DefaultTask {
 
     public CMakeConfigureTask() {
         setGroup("cmake");
-        setDescription("Configure a Build with CMake");
+
         executable = getProject().getObjects().property(String.class);
         workingFolder = getProject().getObjects().directoryProperty();
         sourceFolder = getProject().getObjects().directoryProperty();
@@ -59,7 +60,6 @@ public class CMakeConfigureTask extends DefaultTask {
         def.set( ext.getDef() );
     }
 
-    /// region getters
     @Input
     @Optional
     public Property<String> getExecutable() {
@@ -125,7 +125,7 @@ public class CMakeConfigureTask extends DefaultTask {
     }
     /// endregion
 
-    private List<String> buildCmdLine() {
+    private List<String> buildCmdLine() throws Exception {
         List<String> parameters = new ArrayList<>();
 
         parameters.add(executable.getOrElse("cmake"));
@@ -133,9 +133,9 @@ public class CMakeConfigureTask extends DefaultTask {
         if ( generator.isPresent() && !generator.get().isEmpty() ) {
             parameters.add("-G");
             parameters.add(generator.get());
-        }
-
-        if ( platform.isPresent() && !platform.get().isEmpty() ) {
+        } 
+        
+        if (platform.isPresent() && !platform.get().isEmpty() ) {
             parameters.add("-A");
             parameters.add(platform.get());
         }
@@ -160,6 +160,20 @@ public class CMakeConfigureTask extends DefaultTask {
 
 
         if ( def.isPresent() ) {
+            String proj_name = getName();
+
+            if(proj_name.indexOf("linux") != -1) {
+                String p1 = def.getting("PLATFORM").getOrElse("");
+
+                if(p1.equals("") && proj_name.endsWith("custom")) {
+                    throw new Exception("是否想交叉编译？ 在linux.properties 中定义编译链和 toolchain.platform");
+                }
+
+                if(!p1.equals("") && !proj_name.endsWith("custom")) {
+                    throw new Exception("properties 文件中定义了PLATFORM, 是否为交叉编译？ 使用：build-linux-custom");
+                }
+            }
+        
             for ( Map.Entry<String,String> entry : def.get().entrySet() )
                 parameters.add("-D"+entry.getKey()+"="+entry.getValue());
         }
@@ -170,8 +184,12 @@ public class CMakeConfigureTask extends DefaultTask {
     }
 
     @TaskAction
-    public void configure() {
+    public void configure() throws Exception {
         CMakeExecutor executor = new CMakeExecutor(getLogger(), getName());
+
+        File f = new File(workingFolder.getAsFile().get(), "CMakeCache.txt");
+        f.delete();
+        
         executor.exec(buildCmdLine(), workingFolder.getAsFile().get());
     }
 

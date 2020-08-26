@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import java.lang.System;
+
 public class CMakeExecutor {
     private Logger logger;
     private String taskName;
@@ -29,6 +31,7 @@ public class CMakeExecutor {
 
         // build process
         ProcessBuilder pb = new ProcessBuilder(cmdLine);
+        pb.environment().putAll(System.getenv());
         pb.directory( workingFolder );
 
 

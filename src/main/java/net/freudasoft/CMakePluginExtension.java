@@ -47,6 +47,7 @@ public class CMakePluginExtension {
     private final Property<String> buildConfig;
     private final Property<String> buildTarget;
     private final Property<Boolean> buildClean;
+    private final Property<String> jobCount;
 
 
     public CMakePluginExtension(Project project) {
@@ -64,6 +65,7 @@ public class CMakePluginExtension {
         buildConfig = project.getObjects().property(String.class);
         buildTarget = project.getObjects().property(String.class);
         buildClean = project.getObjects().property(Boolean.class);
+        jobCount = project.getObjects().property(String.class);
 
         // default values
         workingFolder.set(new File(project.getBuildDir(), "cmake"));
@@ -71,6 +73,10 @@ public class CMakePluginExtension {
     }
 
 /// region getters
+    public Property<String> getJobCount() {
+        return jobCount;
+    }
+
     public Property<String> getExecutable() {
         return executable;
     }
