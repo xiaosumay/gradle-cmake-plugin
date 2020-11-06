@@ -23,7 +23,7 @@ public class CMakeConfigureTask extends DefaultTask {
     private final Property<String> toolset; // for example "v142", supported on vs > 10.0
     private final Property<Boolean> buildSharedLibs;
     private final Property<Boolean> buildStaticLibs;
-    private final MapProperty<String,String> def;
+    private final MapProperty<String,String> options;
 
     public CMakeConfigureTask() {
         setGroup("cmake");
@@ -38,7 +38,7 @@ public class CMakeConfigureTask extends DefaultTask {
         toolset = getProject().getObjects().property(String.class);
         buildSharedLibs = getProject().getObjects().property(Boolean.class);
         buildStaticLibs = getProject().getObjects().property(Boolean.class);
-        def = getProject().getObjects().mapProperty(String.class, String.class);
+        options = getProject().getObjects().mapProperty(String.class, String.class);
 
         // default values
         workingFolder.set(new File(getProject().getBuildDir(), "cmake"));
@@ -57,7 +57,7 @@ public class CMakeConfigureTask extends DefaultTask {
         toolset.set( ext.getToolset() );
         buildSharedLibs.set( ext.getBuildSharedLibs() );
         buildStaticLibs.set( ext.getBuildStaticLibs() );
-        def.set( ext.getDef() );
+        options.set( ext.getOptions() );
     }
 
     @Input
@@ -120,8 +120,8 @@ public class CMakeConfigureTask extends DefaultTask {
 
     @Input
     @Optional
-    public MapProperty<String, String> getDef() {
-        return def;
+    public MapProperty<String, String> getOptions() {
+        return options;
     }
     /// endregion
 
@@ -159,11 +159,11 @@ public class CMakeConfigureTask extends DefaultTask {
             parameters.add("-DBUILD_STATIC_LIBS=" + (buildStaticLibs.get().booleanValue() ? "ON" : "OFF") );
 
 
-        if ( def.isPresent() ) {
+        if ( options.isPresent() ) {
             String proj_name = getName();
 
             if(proj_name.indexOf("linux") != -1) {
-                String p1 = def.getting("PLATFORM").getOrElse("");
+                String p1 = options.getting("CUSTOM_PLATFORM").getOrElse("");
 
                 if(p1.equals("") && proj_name.endsWith("custom")) {
                     throw new Exception("是否想交叉编译？ 在linux.properties 中定义编译链和 toolchain.platform");
@@ -172,9 +172,11 @@ public class CMakeConfigureTask extends DefaultTask {
                 if(!p1.equals("") && !proj_name.endsWith("custom")) {
                     throw new Exception("properties 文件中定义了PLATFORM, 是否为交叉编译？ 使用：build-linux-custom");
                 }
+
+                options.put("PLATFORM", p1);
             }
         
-            for ( Map.Entry<String,String> entry : def.get().entrySet() )
+            for ( Map.Entry<String,String> entry : options.get().entrySet() )
                 parameters.add("-D"+entry.getKey()+"="+entry.getValue());
         }
 

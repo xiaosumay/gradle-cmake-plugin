@@ -41,7 +41,7 @@ public class CMakePluginExtension {
     private final Property<String> toolset; // for example "v142", supported on vs > 10.0
     private final Property<Boolean> buildSharedLibs;
     private final Property<Boolean> buildStaticLibs;
-    private final MapProperty<String,String> def;
+    private final MapProperty<String,String> options;
 
     // parameters used on build step
     private final Property<String> buildConfig;
@@ -61,7 +61,7 @@ public class CMakePluginExtension {
         toolset = project.getObjects().property(String.class);
         buildSharedLibs = project.getObjects().property(Boolean.class);
         buildStaticLibs = project.getObjects().property(Boolean.class);
-        def = project.getObjects().mapProperty(String.class, String.class);
+        options = project.getObjects().mapProperty(String.class, String.class);
         buildConfig = project.getObjects().property(String.class);
         buildTarget = project.getObjects().property(String.class);
         buildClean = project.getObjects().property(Boolean.class);
@@ -116,8 +116,8 @@ public class CMakePluginExtension {
         return buildStaticLibs;
     }
 
-    public MapProperty<String, String> getDef() {
-        return def;
+    public MapProperty<String, String> getOptions() {
+        return options;
     }
 
     public Property<String> getBuildConfig() {

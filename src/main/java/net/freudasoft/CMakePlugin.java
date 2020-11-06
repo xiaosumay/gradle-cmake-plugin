@@ -58,7 +58,7 @@ public class CMakePlugin implements Plugin<Project> {
                 task.getToolset().set(extension.getToolset());
                 task.getBuildSharedLibs().set(extension.getBuildSharedLibs());
                 task.getBuildStaticLibs().set(extension.getBuildStaticLibs());
-                task.getDef().set(extension.getDef());
+                task.getOptions().set(extension.getOptions());
             }
         });
 
