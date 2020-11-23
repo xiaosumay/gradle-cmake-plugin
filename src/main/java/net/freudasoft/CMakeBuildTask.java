@@ -80,8 +80,16 @@ public class CMakeBuildTask extends DefaultTask {
     }
     /// endregion
 
+    private Boolean crossFromWin2Linux () {
+        return getName().indexOf("linux") != -1 && System.getProperty("os.name").toLowerCase().contains("windows");
+    }
+
     private List<String> buildCmdLine() {
         List<String> parameters = new ArrayList<>();
+
+        if(crossFromWin2Linux()) {
+            parameters.add("wsl.exe");
+        }
 
         parameters.add(executable.getOrElse("cmake"));
         parameters.add("--build");

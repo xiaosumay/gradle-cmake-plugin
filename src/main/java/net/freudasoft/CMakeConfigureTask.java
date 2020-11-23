@@ -125,8 +125,16 @@ public class CMakeConfigureTask extends DefaultTask {
     }
     /// endregion
 
+    private Boolean crossFromWin2Linux () {
+        return getName().indexOf("linux") != -1 && System.getProperty("os.name").toLowerCase().contains("windows");
+    }
+
     private List<String> buildCmdLine() throws Exception {
         List<String> parameters = new ArrayList<>();
+
+        if(crossFromWin2Linux()) {
+            parameters.add("wsl.exe");
+        }
 
         parameters.add(executable.getOrElse("cmake"));
 
@@ -180,7 +188,11 @@ public class CMakeConfigureTask extends DefaultTask {
                 parameters.add("-D"+entry.getKey()+"="+entry.getValue());
         }
 
-        parameters.add( sourceFolder.getAsFile().get().getAbsolutePath() );
+        if(crossFromWin2Linux()) {
+            parameters.add( "$(wslpath -u '" + sourceFolder.getAsFile().get().getAbsolutePath() + "')");
+        } else {
+            parameters.add(sourceFolder.getAsFile().get().getAbsolutePath());
+        }
 
         return parameters;
     }
