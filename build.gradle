@@ -42,13 +42,13 @@ gradlePlugin {
 
 uploadArchives {
     repositories {
-        mavenDeployer {
-            name = 'WebService'
-            pom.version = version + "-SNAPSHOT"
-            repository(url: 'http://maven.iflytek.com:8081/nexus/content/repositories/YGNOME-snapshot/') {
-                authentication(userName: 'YGNOME', password: 'aiuiclient@ss123')
-            }
-        }
+        // mavenDeployer {
+        //     name = 'WebService'
+        //     pom.version = version + "-SNAPSHOT"
+        //     repository(url: 'http://maven.iflytek.com:8081/nexus/content/repositories/YGNOME-snapshot/') {
+        //         authentication(userName: 'YGNOME', password: 'aiuiclient@ss123')
+        //     }
+        // }
 
         mavenDeployer {
             name = 'aiui-sdk'

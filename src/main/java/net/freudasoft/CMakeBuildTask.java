@@ -2,7 +2,6 @@ package net.freudasoft;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
@@ -33,13 +32,13 @@ public class CMakeBuildTask extends DefaultTask {
     }
 
     public void configureFromProject() {
-        CMakePluginExtension ext = (CMakePluginExtension)getProject().getExtensions().getByName("cmake");
-        executable.set( ext.getExecutable() );
-        workingFolder.set( ext.getWorkingFolder() );
-        buildConfig.set( ext.getBuildConfig() );
-        buildTarget.set( ext.getBuildTarget() );
-        buildClean.set( ext.getBuildClean() );
-        jobCount.set( ext.getJobCount() );
+        CMakePluginExtension ext = (CMakePluginExtension) getProject().getExtensions().getByName("cmake");
+        executable.set(ext.getExecutable());
+        workingFolder.set(ext.getWorkingFolder());
+        buildConfig.set(ext.getBuildConfig());
+        buildTarget.set(ext.getBuildTarget());
+        buildClean.set(ext.getBuildClean());
+        jobCount.set(ext.getJobCount());
     }
 
 
@@ -80,39 +79,39 @@ public class CMakeBuildTask extends DefaultTask {
     }
     /// endregion
 
-    private Boolean crossFromWin2Linux () {
-        return getName().indexOf("linux") != -1 && System.getProperty("os.name").toLowerCase().contains("windows");
+    private Boolean crossFromWin2Linux() {
+        return getName().contains("linux") && System.getProperty("os.name").toLowerCase().contains("windows");
     }
 
     private List<String> buildCmdLine() {
         List<String> parameters = new ArrayList<>();
 
-        if(crossFromWin2Linux()) {
+        if (crossFromWin2Linux()) {
             parameters.add("wsl.exe");
         }
 
         parameters.add(executable.getOrElse("cmake"));
         parameters.add("--build");
-        parameters.add("." ); // working folder will be executable working dir --- workingFolder.getAsFile().get().getAbsolutePath()
+        parameters.add("."); // working folder will be executable working dir --- workingFolder.getAsFile().get().getAbsolutePath()
 
-        if (buildConfig.isPresent() ) {
+        if (buildConfig.isPresent()) {
             parameters.add("--config");
             parameters.add(buildConfig.get());
         }
 
-        if (buildTarget.isPresent() ) {
+        if (buildTarget.isPresent()) {
             parameters.add("--target");
             parameters.add(buildTarget.get());
         }
 
-        if ( buildClean.getOrElse(Boolean.FALSE).booleanValue() )
-            parameters.add( "--clean-first" );
+        if (buildClean.getOrElse(Boolean.FALSE).booleanValue())
+            parameters.add("--clean-first");
 
         if (jobCount.isPresent()) {
             parameters.add("--");
 
             int pn = Runtime.getRuntime().availableProcessors();
-            if(pn > 8) pn = 8;
+            if (pn > 8) pn = 8;
 
             parameters.add("-j" + pn);
         }

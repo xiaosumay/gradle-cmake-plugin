@@ -1,12 +1,12 @@
 /**
  * Copyright 2019 Marco Freudenberger
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,10 +20,8 @@ import org.gradle.api.Project;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
 
 import java.io.File;
-import java.util.*;
 
 public class CMakePluginExtension {
 
@@ -35,13 +33,13 @@ public class CMakePluginExtension {
     // parameters used by config step
     private final DirectoryProperty sourceFolder;
     private final Property<String> configurationTypes;
-    private final Property<String>  installPrefix;
+    private final Property<String> installPrefix;
     private final Property<String> generator; // for example: "Visual Studio 16 2019"
-    private final Property<String> platform ; // for example "x64" or "Win32" or "ARM" or "ARM64", supported on vs > 8.0
+    private final Property<String> platform; // for example "x64" or "Win32" or "ARM" or "ARM64", supported on vs > 8.0
     private final Property<String> toolset; // for example "v142", supported on vs > 10.0
     private final Property<Boolean> buildSharedLibs;
     private final Property<Boolean> buildStaticLibs;
-    private final MapProperty<String,String> options;
+    private final MapProperty<String, String> options;
 
     // parameters used on build step
     private final Property<String> buildConfig;
@@ -66,13 +64,9 @@ public class CMakePluginExtension {
         buildTarget = project.getObjects().property(String.class);
         buildClean = project.getObjects().property(Boolean.class);
         jobCount = project.getObjects().property(String.class);
-
-        // default values
-        workingFolder.set(new File(project.getBuildDir(), "cmake"));
-        sourceFolder.set(new File(project.getBuildDir(), "src" + File.separator + "main" + File.separator + "cpp"));
     }
 
-/// region getters
+    /// region getters
     public Property<String> getJobCount() {
         return jobCount;
     }
@@ -104,6 +98,7 @@ public class CMakePluginExtension {
     public Property<String> getPlatform() {
         return platform;
     }
+
     public Property<String> getToolset() {
         return toolset;
     }
@@ -132,8 +127,6 @@ public class CMakePluginExtension {
         return buildClean;
     }
 /// endregion getters
-
-
 
 
 }
