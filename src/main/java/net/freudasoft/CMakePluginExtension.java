@@ -37,6 +37,7 @@ public class CMakePluginExtension {
     private final Property<String> generator; // for example: "Visual Studio 16 2019"
     private final Property<String> platform; // for example "x64" or "Win32" or "ARM" or "ARM64", supported on vs > 8.0
     private final Property<String> toolset; // for example "v142", supported on vs > 10.0
+    private final Property<String> distribution;
     private final Property<Boolean> buildSharedLibs;
     private final Property<Boolean> buildStaticLibs;
     private final MapProperty<String, String> options;
@@ -57,6 +58,7 @@ public class CMakePluginExtension {
         generator = project.getObjects().property(String.class);
         platform = project.getObjects().property(String.class);
         toolset = project.getObjects().property(String.class);
+        distribution = project.getObjects().property(String.class);
         buildSharedLibs = project.getObjects().property(Boolean.class);
         buildStaticLibs = project.getObjects().property(Boolean.class);
         options = project.getObjects().mapProperty(String.class, String.class);
@@ -101,6 +103,10 @@ public class CMakePluginExtension {
 
     public Property<String> getToolset() {
         return toolset;
+    }
+
+    public Property<String> getDistribution() {
+        return distribution;
     }
 
     public Property<Boolean> getBuildSharedLibs() {

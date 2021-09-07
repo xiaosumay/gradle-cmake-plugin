@@ -22,6 +22,7 @@ public class CMakeConfigureTask extends DefaultTask {
     private final Property<String> generator; // for example: "Visual Studio 16 2019"
     private final Property<String> platform; // for example "x64" or "Win32" or "ARM" or "ARM64", supported on vs > 8.0
     private final Property<String> toolset; // for example "v142", supported on vs > 10.0
+    private final Property<String> distribution; 
     private final Property<Boolean> buildSharedLibs;
     private final Property<Boolean> buildStaticLibs;
     private final MapProperty<String, String> options;
@@ -37,6 +38,7 @@ public class CMakeConfigureTask extends DefaultTask {
         generator = getProject().getObjects().property(String.class);
         platform = getProject().getObjects().property(String.class);
         toolset = getProject().getObjects().property(String.class);
+        distribution = getProject().getObjects().property(String.class);
         buildSharedLibs = getProject().getObjects().property(Boolean.class);
         buildStaticLibs = getProject().getObjects().property(Boolean.class);
         options = getProject().getObjects().mapProperty(String.class, String.class);
@@ -52,6 +54,7 @@ public class CMakeConfigureTask extends DefaultTask {
         generator.set(ext.getGenerator());
         platform.set(ext.getPlatform());
         toolset.set(ext.getToolset());
+        distribution.set(ext.getDistribution());
         buildSharedLibs.set(ext.getBuildSharedLibs());
         buildStaticLibs.set(ext.getBuildStaticLibs());
         options.set(ext.getOptions());
@@ -105,6 +108,12 @@ public class CMakeConfigureTask extends DefaultTask {
 
     @Input
     @Optional
+    public Property<String> getDistribution() {
+        return distribution;
+    }
+
+    @Input
+    @Optional
     public Property<Boolean> getBuildSharedLibs() {
         return buildSharedLibs;
     }
@@ -131,6 +140,11 @@ public class CMakeConfigureTask extends DefaultTask {
 
         if (crossFromWin2Linux()) {
             parameters.add("wsl.exe");
+
+            if (distribution.isPresent() && !distribution.get().isEmpty()) {
+                parameters.add("--distribution");
+                parameters.add(distribution.get());
+            }
         }
 
         parameters.add(executable.getOrElse("cmake"));
@@ -158,29 +172,13 @@ public class CMakeConfigureTask extends DefaultTask {
 
 
         if (buildSharedLibs.isPresent())
-            parameters.add("-DBUILD_SHARED_LIBS=" + (buildSharedLibs.get().booleanValue() ? "ON" : "OFF"));
+            parameters.add("-DBUILD_SHARED_LIBS=" + (buildSharedLibs.get() ? "ON" : "OFF"));
 
         if (buildStaticLibs.isPresent())
-            parameters.add("-DBUILD_STATIC_LIBS=" + (buildStaticLibs.get().booleanValue() ? "ON" : "OFF"));
+            parameters.add("-DBUILD_STATIC_LIBS=" + (buildStaticLibs.get() ? "ON" : "OFF"));
 
 
         if (options.isPresent()) {
-            String proj_name = getName();
-
-            if (proj_name.contains("linux")) {
-                String p1 = options.getting("CUSTOM_PLATFORM").getOrElse("");
-
-                if (p1.equals("") && proj_name.endsWith("custom")) {
-                    throw new Exception("是否想交叉编译？ 在linux.properties 中定义编译链和 toolchain.platform");
-                }
-
-                if (!p1.equals("") && !proj_name.endsWith("custom")) {
-                    throw new Exception("properties 文件中定义了PLATFORM, 是否为交叉编译？ 使用：build-linux-custom");
-                }
-
-                options.put("PLATFORM", p1);
-            }
-
             for (Map.Entry<String, String> entry : options.get().entrySet())
                 parameters.add("-D" + entry.getKey() + "=" + entry.getValue());
         }

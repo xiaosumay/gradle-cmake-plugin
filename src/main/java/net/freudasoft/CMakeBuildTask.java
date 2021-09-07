@@ -17,6 +17,7 @@ public class CMakeBuildTask extends DefaultTask {
     private final Property<String> buildConfig;
     private final Property<String> buildTarget;
     private final Property<Boolean> buildClean;
+    private final Property<String> distribution; 
 
     private final Property<String> jobCount;
 
@@ -28,6 +29,7 @@ public class CMakeBuildTask extends DefaultTask {
         buildConfig = getProject().getObjects().property(String.class);
         buildTarget = getProject().getObjects().property(String.class);
         buildClean = getProject().getObjects().property(Boolean.class);
+        distribution = getProject().getObjects().property(String.class);
         jobCount = getProject().getObjects().property(String.class);
     }
 
@@ -38,6 +40,7 @@ public class CMakeBuildTask extends DefaultTask {
         buildConfig.set(ext.getBuildConfig());
         buildTarget.set(ext.getBuildTarget());
         buildClean.set(ext.getBuildClean());
+        distribution.set(ext.getDistribution());
         jobCount.set(ext.getJobCount());
     }
 
@@ -74,6 +77,12 @@ public class CMakeBuildTask extends DefaultTask {
 
     @Input
     @Optional
+    public Property<String> getDistribution() {
+        return distribution;
+    }
+
+    @Input
+    @Optional
     public Property<String> getJobCount() {
         return jobCount;
     }
@@ -88,6 +97,11 @@ public class CMakeBuildTask extends DefaultTask {
 
         if (crossFromWin2Linux()) {
             parameters.add("wsl.exe");
+
+            if (distribution.isPresent() && !distribution.get().isEmpty()) {
+                parameters.add("--distribution");
+                parameters.add(distribution.get());
+            }
         }
 
         parameters.add(executable.getOrElse("cmake"));
@@ -104,7 +118,7 @@ public class CMakeBuildTask extends DefaultTask {
             parameters.add(buildTarget.get());
         }
 
-        if (buildClean.getOrElse(Boolean.FALSE).booleanValue())
+        if (buildClean.getOrElse(Boolean.FALSE))
             parameters.add("--clean-first");
 
         if (jobCount.isPresent()) {
