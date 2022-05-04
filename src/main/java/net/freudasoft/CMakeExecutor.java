@@ -27,7 +27,7 @@ public class CMakeExecutor {
         for (String s : cmdLine) {
             sb.append(s).append(" ");
         }
-        logger.info(sb.toString());
+        System.out.println(sb);
 
         // build process
         ProcessBuilder pb = new ProcessBuilder(cmdLine);
@@ -47,7 +47,7 @@ public class CMakeExecutor {
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while (null != (line = reader.readLine())) {
-                logger.info(line);
+                System.out.println(line);
             }
 
             int retCode = process.waitFor();

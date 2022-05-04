@@ -23,8 +23,10 @@ version = "19.199.3"
 // If your plugin has any external java dependencies, Gradle will attempt to
 // download them from JCenter for anyone using the plugins DSL
 repositories {
-    mavenCentral()
-    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://plugins.gradle.org/m2/' }
+    maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
+    maven { url 'https://maven.aliyun.com/nexus/content/groups/public' }
+    maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
 }
 dependencies {
     compile gradleApi()
