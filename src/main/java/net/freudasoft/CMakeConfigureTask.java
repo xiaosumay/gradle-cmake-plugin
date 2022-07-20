@@ -22,7 +22,7 @@ public class CMakeConfigureTask extends DefaultTask {
     private final Property<String> generator; // for example: "Visual Studio 16 2019"
     private final Property<String> platform; // for example "x64" or "Win32" or "ARM" or "ARM64", supported on vs > 8.0
     private final Property<String> toolset; // for example "v142", supported on vs > 10.0
-    private final Property<String> distribution; 
+    private final Property<String> distribution;
     private final Property<Boolean> buildSharedLibs;
     private final Property<Boolean> buildStaticLibs;
     private final MapProperty<String, String> options;
@@ -147,7 +147,13 @@ public class CMakeConfigureTask extends DefaultTask {
             }
         }
 
-        parameters.add(executable.getOrElse("cmake"));
+        String cmake = executable.getOrElse("cmake");
+
+        if (crossFromWin2Linux() && cmake.indexOf(":") == 1) {
+            parameters.add("$(wslpath -u '" + cmake + "')");
+        } else {
+            parameters.add(cmake);
+        }
 
         if (generator.isPresent() && !generator.get().isEmpty()) {
             parameters.add("-G");
@@ -206,7 +212,7 @@ public class CMakeConfigureTask extends DefaultTask {
     public void configure() throws Exception {
         CMakeExecutor executor = new CMakeExecutor(getLogger(), getName());
 
-        if(deleteDirectory(workingFolder.getAsFile().get())) {
+        if (deleteDirectory(workingFolder.getAsFile().get())) {
             executor.exec(buildCmdLine(), workingFolder.getAsFile().get());
         } else {
             throw new GradleException("[" + getName() + "]Error: Directory can not be cleaned!");

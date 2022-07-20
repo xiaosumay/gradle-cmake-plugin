@@ -17,7 +17,7 @@ public class CMakeBuildTask extends DefaultTask {
     private final Property<String> buildConfig;
     private final Property<String> buildTarget;
     private final Property<Boolean> buildClean;
-    private final Property<String> distribution; 
+    private final Property<String> distribution;
 
     private final Property<String> jobCount;
 
@@ -104,7 +104,14 @@ public class CMakeBuildTask extends DefaultTask {
             }
         }
 
-        parameters.add(executable.getOrElse("cmake"));
+        String cmake = executable.getOrElse("cmake");
+
+        if (crossFromWin2Linux() && cmake.indexOf(":") == 1) {
+            parameters.add("$(wslpath -u '" + cmake + "')");
+        } else {
+            parameters.add(cmake);
+        }
+
         parameters.add("--build");
         parameters.add("."); // working folder will be executable working dir --- workingFolder.getAsFile().get().getAbsolutePath()
 
